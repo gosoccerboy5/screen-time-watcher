@@ -59,11 +59,11 @@ browser.runtime.onMessage.addListener(function(message, sender, respond) {
   return true;
 });
 
-let popupPort = null;
+let ports = [];
 browser.runtime.onConnect.addListener(function(p) {
-  popupPort = p;
-  p.onDisconnect(function() {
-    popupPort = null;
+  ports.push(p);
+  p.onDisconnect.addListener(function() {
+    ports.splice(ports.indexOf(p));
   });
 });
 
@@ -100,7 +100,7 @@ function update() {
     if (isMatch(urls, currentTab.url)) {
       timeLeft -= 1;
       browser.storage.local.set({timeLeft}).then(res => {
-        popupPort?.postMessage({left: timeLeft});
+        ports.forEach(port => port?.postMessage({left: timeLeft}));
       });
     }
   });

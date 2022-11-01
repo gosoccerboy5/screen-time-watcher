@@ -12,7 +12,7 @@ function optionEl(val = "") {
 }
 const dialog = function(message) {
   let div = document.createElement("div");
-  div.innerHTML = `<div><button class="ok">&#10006;</button><div>Alert</div><hr><span>${message}</span><div>`;
+  div.innerHTML = `<span style="font-size:150%;"><button class="ok">&#10006;</button><div>Alert</div></span><hr><span>${message}</span>`;
   div.className = "dialog";
   document.body.append(div);
   document.body.className = "has-modal";
@@ -73,10 +73,7 @@ browser.storage.local.get("password", ({password}) => {
     input("Since this is your first time here, please make sure to make a password.").then(pw => {
       browser.runtime.sendMessage({
         password: pw,
-      }).then(res => {
-        console.log(res);
-        dialog(res);
-      });
+      }).then(dialog);
     })
   }
 });
