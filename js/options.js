@@ -24,9 +24,9 @@ const dialog = function(message) {
     });
   });
 };
-const input = function (message) {
+const input = function (message, password=false) {
   let div = document.createElement("div");
-  div.innerHTML = `<span>${message}</span><br><input></input><button class="submit">Submit</button>`;
+  div.innerHTML = `<span>${message}</span><br><input${password ? ' type="password"' : ""}></input><button class="submit">Submit</button>`;
   div.className = "dialog";
   document.body.append(div);
   document.body.className = "has-modal";
@@ -53,7 +53,7 @@ browser.storage.local.get(["urls", "totalTime"], ({ urls, totalTime }) => {
 });
 
 $("#save").addEventListener("click", function() {
-  input("Please enter your password to make changes").then(password => {
+  input("Please enter your password to make changes", true).then(password => {
     browser.runtime.sendMessage({
       "urls": [...urlList.children].map(div => div.querySelector(".url").value).filter(url => url !== ""),
       "time": $("#hrs").value * 3600 + $("#min").value * 60,
@@ -70,7 +70,7 @@ $("#add").addEventListener("click", function() {
 
 browser.storage.local.get("password", ({password}) => {
   if (password === null) {
-    input("Since this is your first time here, please make sure to make a password.").then(pw => {
+    input("Since this is your first time here, please make sure to make a password.", true).then(pw => {
       browser.runtime.sendMessage({
         password: pw,
       }).then(dialog);
