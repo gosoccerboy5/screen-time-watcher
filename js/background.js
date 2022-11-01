@@ -72,9 +72,10 @@ function isMatch(urls, current) {
 }
 
 function update() {
-  Promise.all([browser.tabs.query({active: true, currentWindow: true}), browser.storage.local.get(["urls", "timeLeft"])]).then(res => {
+  Promise.all([browser.tabs.query({active: true, currentWindow: true}), browser.storage.local.get(["urls", "timeLeft", "totalTime"])]).then(res => {
     let urls = res[1].urls;
     let timeLeft = res[1].timeLeft;
+    let totalTime = res[1].totalTime;
     if (timeLeft <= 0) { // We have run out of time for today!
       chrome.tabs.query({}, tabs => {
         tabs.forEach(tab => {
@@ -100,7 +101,7 @@ function update() {
     if (isMatch(urls, currentTab.url)) {
       timeLeft -= 1;
       browser.storage.local.set({timeLeft}).then(res => {
-        ports.forEach(port => port?.postMessage({left: timeLeft}));
+        ports.forEach(port => port?.postMessage({left: timeLeft, totalTime}));
       });
     }
   });
