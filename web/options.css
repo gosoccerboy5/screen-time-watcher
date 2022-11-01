@@ -1,0 +1,97 @@
+body {
+    font-family: "Google Sans", "Helvetica Neue", Arial, sans-serif;
+    background-color: #dddddd;
+}
+button {
+    cursor: pointer;
+    border-radius: 100000px;
+    background-color: darkgrey;
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border: none;
+}
+button:active {
+    background-color: #4a4545;
+    transition-duration: 0.5s;
+}
+input {
+    border: none;
+    border-bottom: 1px solid black;
+    padding: 5px;
+    border-radius: 3px;
+}
+input:focus {
+    outline: none;
+}
+input:hover:not(:focus) {
+    background-color: lightgrey;
+    transition-duration: 1s;
+}
+@keyframes dialoganimate {
+  from {top: 0;}
+}
+.dialog {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  min-height: 10%;
+  background-color: whitesmoke;
+  border-radius: 10px;
+  border: 3px solid lightgray;
+  z-index: 999;
+  font-size: 150%;
+  pointer-events: auto;
+  padding: 10px;
+  animation-name: dialoganimate;
+  animation-duration: 0.3s;
+  font-weight: 400;
+}
+.dialog span {
+  font-size: 67%;
+}
+.dialog .ok {
+  float: right;
+  margin: 0px;
+  padding-right: 10px;
+  padding-left: 10px;
+  font-size: 80%;
+  border-radius: 100%;
+  background-color: whitesmoke;
+}
+.dialog .ok:active {
+  background-color: lightgrey;
+}
+.dialog .ok:hover:not(:active) {
+  background-color: #eae9e9;
+}
+.dialog hr {
+  border: 1px solid lightgrey;
+}
+.has-modal > *:not(.dialog) {
+  pointer-events: none;
+  filter: blur(2px);
+  user-select: none;
+}
+.has-modal {
+  overflow-y: hidden;
+}
+.dialog .submit {
+  border-radius: 5px;
+  float: right;
+  border: 1px solid black;
+  background: whitesmoke;
+  padding: 10px;
+  transition-duration: 0.2s;
+}
+.dialog .submit:hover {
+  background-color: lightgrey;
+  transition-duration: 0.2s;
+}
+.dialog input {
+  min-width: 75%;
+  border: 1px solid black;
+}

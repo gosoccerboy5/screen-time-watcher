@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Screen Time Watcher settings ⚙️</title>
+    <link rel="favicon" href="../images/icon48.png">
+    <link rel="stylesheet" href="options.css">
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <h1 style="font-weight: 400;">Screen Time Watcher settings ⚙️</h1>
+    <p>Matches url globs (* stands for anything) and does not require <code>https://</code> or <code>www.</code> before the url</p>
+    <button id="save">Save preferences</button> <button id="add">+</button>
+    <div id="time" style="margin-top:20px;"><label>Hours: </label><input id="hrs" type="number"></input> <label>Minutes: </label><input id="min" type="number"></input></div>
+    <br>
+    <label>Urls:</label>
+    <br>
+    <div id="whitelisted">
+    </div>
+    <script src="../js/options.js"></script>
+  </body>
+</html>
