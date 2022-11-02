@@ -25,11 +25,11 @@ function endAll() {
 }
 
 function isMatch(urls) {
-    return urls.some(url => (new RegExp("^https?://(www\.)?" + (url.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&').replace("*", ".*?")))).test(location.href));
+    return urls.some(url => (new RegExp("^(https?://(www\.)?)?" + (url.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&').replace("*", ".*?")))).test(location.href));
 }
 
-browser.storage.local.get(["urls", "timeLeft"]).then(res => {
-    if (res["timeLeft"] <= 0 && isMatch(res["urls"])) {
+browser.storage.local.get(["urls", "timeLeft", "blacklistedUrls"]).then(res => {
+    if ((res["timeLeft"] <= 0 && isMatch(res["urls"])) || isMatch(res["blacklistedUrls"])) {
         endAll();
     }
 });

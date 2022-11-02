@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document);
 
-const urlList = $("#whitelisted");
+const urlList = $("#limited");
+const whitelisted = $("#whitelisted");
+const blacklisted = $("#blacklisted");
 
 function optionEl(val = "") {
   let div = document.createElement("div");
@@ -44,9 +46,15 @@ const input = function (message, password=false) {
   });
 };
 
-browser.storage.local.get(["urls", "totalTime"], ({ urls, totalTime }) => {
+browser.storage.local.get(["urls", "totalTime", "whitelistedUrls", "blacklistedUrls"], ({ urls, totalTime, whitelistedUrls, blacklistedUrls }) => {
   urls.forEach(url => {
     urlList.append(optionEl(url));
+  });
+  whitelistedUrls.forEach(url => {
+    whitelisted.append(optionEl(url));
+  });
+  blacklistedUrls.forEach(url => {
+    blacklisted.append(optionEl(url));
   });
   $("#hrs").value = new Date(totalTime * 1000).getUTCHours();
   $("#min").value = new Date(totalTime * 1000).getUTCMinutes();
@@ -57,14 +65,28 @@ $("#save").addEventListener("click", function() {
     browser.runtime.sendMessage({
       "urls": [...urlList.children].map(div => div.querySelector(".url").value).filter(url => url !== ""),
       "time": $("#hrs").value * 3600 + $("#min").value * 60,
+      "blacklistedUrls": [...blacklisted.children].map(div => div.querySelector(".url").value).filter(url => url !== ""),
+      "whitelistedUrls": [...whitelisted.children].map(div => div.querySelector(".url").value).filter(url => url !== ""),
       password,
     }).then(dialog);
   });
 });
 
-$("#add").addEventListener("click", function() {
+$("#addlimited").addEventListener("click", function() {
   let el = optionEl();
   urlList.append(el);
+  el.querySelector("input").focus();
+});
+
+$("#addwhitelisted").addEventListener("click", function() {
+  let el = optionEl();
+  whitelisted.append(el);
+  el.querySelector("input").focus();
+});
+
+$("#addblacklisted").addEventListener("click", function() {
+  let el = optionEl();
+  blacklisted.append(el);
   el.querySelector("input").focus();
 });
 

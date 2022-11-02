@@ -4,9 +4,11 @@ browser.runtime.onInstalled.addListener(() => {
     urls: [
       "example.com",
     ], 
-    password: null,
+    whitelistedUrls: [],
+    blacklistedUrls: [],
     totalTime: time,
     timeLeft: time,
+    password: null,
   });
   browser.tabs.create({
     url:  `../web/options.html`
@@ -41,9 +43,11 @@ browser.runtime.onMessage.addListener(function(message, sender, respond) {
         respond("Settings could not be updated: password incorrect");
         return true;
       }
-      if (message["urls"] instanceof Array) {
+      if (message["urls"] instanceof Array && message["blacklistedUrls"] instanceof Array && message["whitelistedUrls"] instanceof Array) {
         browser.storage.local.set({
-          urls: message["urls"]
+          urls: message["urls"],
+          blacklistedUrls: message["blacklistedUrls"],
+          whitelistedUrls: message["whitelistedUrls"],
         });
       }
       if (typeof message["time"] === "number") {
@@ -68,11 +72,11 @@ browser.runtime.onConnect.addListener(function(p) {
 });
 
 function isMatch(urls, current) {
-  return urls.some(url => (new RegExp("^https?://(www\.)?" + (url.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&').replace("*", ".*?")))).test(current));
+  return urls.some(url => (new RegExp("^(https?://(www\.)?)?" + (url.replace(/[-\/\\^$+?.()|[\]{}]/g, '\\$&').replace("*", ".*?")))).test(current));
 }
 
 function update() {
-  Promise.all([browser.tabs.query({active: true, currentWindow: true}), browser.storage.local.get(["urls", "timeLeft", "totalTime"])]).then(res => {
+  Promise.all([browser.tabs.query({active: true, currentWindow: true}), browser.storage.local.get(["urls", "timeLeft", "totalTime", "whitelistedUrls"])]).then(res => {
     let urls = res[1].urls;
     let timeLeft = res[1].timeLeft;
     let totalTime = res[1].totalTime;
@@ -98,7 +102,7 @@ function update() {
     if (urls.length === 0 || currentTab === undefined) {
       return;
     }
-    if (isMatch(urls, currentTab.url)) {
+    if (isMatch(urls, currentTab.url) && !isMatch(res[1]["whitelistedUrls"], currentTab.url)) {
       timeLeft -= 1;
       browser.storage.local.set({timeLeft}).then(res => {
         ports.forEach(port => port?.postMessage({left: timeLeft, totalTime}));

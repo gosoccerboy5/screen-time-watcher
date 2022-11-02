@@ -9,12 +9,18 @@
   <body>
     <h1 style="font-weight: 400;">Screen Time Watcher settings ⚙️</h1>
     <p>Matches url globs (* stands for anything) and does not require <code>https://</code> or <code>www.</code> before the url</p>
-    <button id="save">Save preferences</button> <button id="add">+</button>
+    <button id="save">Save preferences</button>
     <div id="time" style="margin-top:20px;"><label>Hours: </label><input id="hrs" type="number"></input> <label>Minutes: </label><input id="min" type="number"></input></div>
     <br>
-    <label>Urls:</label>
+    <label>Limited Screen Time urls:</label> <button id="addlimited">+</button>
+    <div id="limited"></div>
     <br>
+    <label>Whitelisted urls:</label> <button id="addwhitelisted">+</button>
     <div id="whitelisted">
+    </div>
+    <br>
+    <label>Blacklisted urls:</label> <button id="addblacklisted">+</button>
+    <div id="blacklisted">
     </div>
     <script src="../js/options.js"></script>
   </body>
