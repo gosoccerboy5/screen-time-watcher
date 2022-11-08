@@ -1,3 +1,47 @@
+var Alarm = (function() {
+  let alarms = [];
+  class alarm {
+    constructor(date, interval=null) {
+      alarms.push(this);
+      this.date = date;
+      this.interval = interval;
+      this.listeners = [];
+    }
+    listen(fn) {
+      this.listeners.push(fn);
+    }
+    end() {
+      alarms.splice(alarms.indexOf(this), 1);
+    }
+  }
+  function update() {
+    let currentDate = Date.now();
+    alarms.forEach(alarm => {
+      if (currentDate > alarm.date) {
+        if (alarm.interval !== null) {
+          alarm.date += alarm.interval;
+        } else {
+          alarms.splice(alarms.indexOf(alarm), 1);
+        }
+        alarm.listeners.forEach(listener => {
+          listener(currentDate);
+        });
+      }
+    });
+  }
+  
+  setInterval(update, 1000);
+  
+  return {
+    interval(date, interval) {
+      return new alarm(date instanceof Date ? date.getTime() : date, interval);
+    },
+    onDate(date) {
+      return new alarm(date instanceof Date ? date.getTime() : date);
+    },
+  }
+})();
+
 browser.runtime.onInstalled.addListener(() => {
   let time = 3 * 60 * 60;
   browser.storage.local.set({
@@ -113,19 +157,16 @@ function update() {
 
 let interval = setInterval(update, 1000);
 
-let msTillMidnight = (new Date().setHours(24, 0, 0, 0) - Date.now());
-
 function restart() {
-  browser.storage.local.get("totalTime").then(res => {
-    browser.storage.local.set({timeLeft: res["totalTime"]});
+  clearInterval(interval);
+  browser.storage.local.get("totalTime").then(({totalTime}) => {
+    browser.storage.local.set({timeLeft: totalTime}).then(() => {
+      interval = setInterval(update, 1000);
+      ports.forEach(port => port?.postMessage({left: totalTime, totalTime}));
+    })
   });
-  if (!running) {
-    running = true;
-    interval = setInterval(update, 1000);
-  }
 }
 
-new Promise(resolve => setTimeout(resolve, msTillMidnight)).then(() => {
-  restart();
-  setInterval(restart, 1000 * 60 * 60 * 24);
-});
+let dailyReset = Alarm.interval(new Date().setHours(24, 0, 0, 0), 24 * 60 * 60 * 1000);
+
+dailyReset.listen(restart);
