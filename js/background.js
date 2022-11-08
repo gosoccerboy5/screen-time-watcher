@@ -11,17 +11,22 @@ var Alarm = (function() {
       this.listeners.push(fn);
     }
     end() {
-      alarms.splice(alarms.indexOf(this), 1);
+      let index = alarms.indexOf(this);
+      if (index === -1) return false;
+      alarms.splice(index, 1);
+      return true;
     }
   }
   function update() {
     let currentDate = Date.now();
     alarms.forEach(alarm => {
-      if (currentDate > alarm.date) {
+      if (currentDate >= alarm.date) {
         if (alarm.interval !== null) {
-          alarm.date += alarm.interval;
+          while (currentDate > alarm.date) {
+            alarm.date += alarm.interval;
+          }
         } else {
-          alarms.splice(alarms.indexOf(alarm), 1);
+          alarm.end();
         }
         alarm.listeners.forEach(listener => {
           listener(currentDate);
@@ -29,9 +34,7 @@ var Alarm = (function() {
       }
     });
   }
-  
   setInterval(update, 1000);
-  
   return {
     interval(date, interval) {
       return new alarm(date instanceof Date ? date.getTime() : date, interval);
