@@ -1,17 +1,19 @@
 function endAll() {
     document.body.innerHTML = `<style>
     center {
-        margin-top: 10%;
-        font-size: 1.5rem;
+        margin-top: 10% !important;
+        font-size: 1.5rem !important;
+        color: black !important;
     }
     a {
-        color: blue;
+        color: blue !important;
     }
     a:active {
-        color: red;
+        color: red !important;
     }
     body {
-        font-family: sans-serif;
+        font-family: sans-serif !important;
+        background-color: white !important;
     }
     </style>
     <center>This page was blocked by the "Screen Time Watcher" extension.

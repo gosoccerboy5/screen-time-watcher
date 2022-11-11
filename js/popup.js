@@ -24,10 +24,10 @@ function clock(ctx, x, y, radius, percentUsed) {
   ctx.fillStyle = "lightgrey";
   ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "pink";
+  if (percentUsed !== 0) ctx.fillStyle = "pink";
   ctx.beginPath();
   ctx.moveTo(x, y);
-  ctx.arc(x, y, radius, toRadians(270), toRadians(percentUsed*360/100 - 90));
+  ctx.arc(x, y, radius, toRadians(270), percentUsed === 100 ? toRadians(-90) : toRadians(percentUsed*360/100 - 90));
   ctx.lineTo(x,y);
   ctx.fill();
   ctx.fillStyle = "black";
@@ -44,5 +44,5 @@ browser.storage.local.get(["timeLeft", "totalTime"]).then(res => {
 
 function update(timeLeft, totalTime) {
   timeEl.innerText = format(timeLeft);
-  clock(ctx, 50, 50, 30, ((totalTime-timeLeft)*100)/(totalTime) + 0.01);
+  clock(ctx, 50, 50, 30, ((totalTime-timeLeft)*100)/(totalTime));
 }

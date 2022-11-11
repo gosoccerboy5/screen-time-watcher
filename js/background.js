@@ -70,7 +70,6 @@ async function sha256(message) {
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   return hashHex;
 }
-let running = true;
 
 browser.runtime.onMessage.addListener(function(message, sender, respond) {
   if (message["optionsPage"]) {
@@ -102,7 +101,8 @@ browser.runtime.onMessage.addListener(function(message, sender, respond) {
           totalTime: message["time"],
           timeLeft: message["time"] + timeLeft - totalTime,
         });
-        running = true;
+        clearInterval(interval);
+        interval = setInterval(update, 1000);
       }
       respond("Settings successfully updated!");
     });
@@ -127,6 +127,16 @@ function update() {
     let urls = res[1].urls;
     let timeLeft = res[1].timeLeft;
     let totalTime = res[1].totalTime;
+    let currentTab = res[0][0];
+    if (urls.length === 0 || currentTab === undefined) {
+      return;
+    }
+    if (isMatch(urls, currentTab.url) && !isMatch(res[1]["whitelistedUrls"], currentTab.url)) {
+      timeLeft -= 1;
+      browser.storage.local.set({timeLeft}).then(res => {
+        ports.forEach(port => port?.postMessage({left: timeLeft, totalTime}));
+      });
+    }
     if (timeLeft <= 0) { // We have run out of time for today!
       chrome.tabs.query({}, tabs => {
         tabs.forEach(tab => {
@@ -142,18 +152,7 @@ function update() {
         iconUrl: "../images/icon128.png",
       });
       clearInterval(interval);
-      running = false;
       return;
-    }
-    let currentTab = res[0][0];
-    if (urls.length === 0 || currentTab === undefined) {
-      return;
-    }
-    if (isMatch(urls, currentTab.url) && !isMatch(res[1]["whitelistedUrls"], currentTab.url)) {
-      timeLeft -= 1;
-      browser.storage.local.set({timeLeft}).then(res => {
-        ports.forEach(port => port?.postMessage({left: timeLeft, totalTime}));
-      });
     }
   });
 }
